@@ -3,94 +3,755 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Image Cropper Online | Resize Photos to Exact Sizes</title>
-	<meta name="keywords" content="free image cropper, crop tool, resize photo, social media image resizer">
+    <meta name="description" content="Free online image cropper tool - Crop, resize and optimize your photos for social media, websites and more. Supports JPG, PNG, WEBP formats.">
+    <meta name="keywords" content="image cropper, photo editor, online crop tool, resize images, picture cropper, free photo editor, web image tool, social media image resizer">
+    <title>Smart Image Cropper - Free Online Photo Cropping Tool</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+    <style type="text/tailwindcss">
+        @theme {
+            --color-primary: #3B82F6;
+            --color-secondary: #10B981;
+            --color-accent: #F59E0B;
+            --color-dark: #1F2937;
+            --color-light: #F3F4F6;
+            --font-inter: 'Inter', sans-serif;
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        
+        @utility smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        @utility card-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        @utility card-shadow-hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        
+        @utility btn-hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
         .upload-section {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            text-align: center;
+            @apply border-2 border-dashed border-gray-300 rounded-xl p-6 bg-white shadow-sm smooth-transition;
         }
-        #image {
-            max-width: 100%;
-            max-height: 400px;
+        
+        .upload-section:hover {
+            @apply border-primary bg-primary/5;
         }
-        .controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        
+        .preview-img img {
+            @apply transition-transform duration-300;
         }
-        button {
-            padding: 10px 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
+        
+        .preview-img img:hover {
+            @apply transform scale-105;
         }
-        button:hover {
-            background: #0056b3;
-        }
-        .preview {
-            width: 100px;
-            height: 100px;
-            overflow: hidden;
-            border: 1px solid #ccc;
+        
+        .custom-toast {
+            @apply fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 smooth-transition transform translate-y-20 opacity-0;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Free Image Cropper Tool ✂️</h1>
+<body class="bg-gray-50 text-dark min-h-screen font-inter">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header Section -->
+        <header class="text-center mb-8">
+            <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-primary mb-2">
+                <i class="fas fa-image mr-3"></i>Smart Image Cropper Tool
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Easily crop, resize and optimize your images with multiple preset sizes and custom cropping</p>
+        </header>
         
-        <div class="upload-section">
-		
-            <input type="file" id="upload" accept="image/*" value="Image">
-            <p>drop an image here 🖼️</p>
-        </div>
-
-        <div class="controls">
-            <label for="size">Crop size:</label>
-            <select id="size">
-                <option value="64x64">64×64(Icons)</option>
-                <option value="128x128">128×128</option>
-                <option value="192x192">192×192</option>
-                <option value="256x256">256×256</option>
-                <option value="512x512">512×512 (HD Avatars)</option>
-                <option value="1024x1024">1024×1024</option>
-                <option value="1080x1080">1080×1080(Instagram)</option>
-                <option value="1200x630">1200×630(Facebook OG)</option>
-                <option value="1920x1080">1920×1080(16:9 Widescreen)</option>
-            </select>
-            <button id="crop-btn">Crop ✂️</button>
-            <button id="download-btn">Download 🔽</button>
-        </div>
-
-        <div>
-            <img id="image" src="" alt="Preview">
-        </div>
-
-        <div class="preview-container">
-            <h3>Cropped Preview:</h3>
-            <div class="preview"></div>
-        </div>
+        <!-- Upload Section -->
+        <section id="uploadSection" class="mb-8 upload-section">
+            <div class="text-center">
+                <div class="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Drag & drop your image here or</h3>
+                <p class="text-gray-500 mb-6">Supports JPG, PNG, WEBP and other common image formats</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="uploadBtn" class="btn bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg smooth-transition btn-hover">
+                        <i class="fas fa-file-image mr-2"></i>Select Image
+                    </button>
+                  
+                </div>
+                <input type="file" id="fileInput" accept="image/*" class="hidden">
+            </div>
+        </section>
+        
+        <!-- Preset Sizes Section -->
+        <section class="presets-section mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-xl font-semibold mb-4 md:mb-0 flex items-center">
+                    <i class="fas fa-th-list mr-2 text-primary"></i>Common Size Presets
+                </h2>
+                <div class="relative">
+                    <button id="presetDropdownBtn" type="button" class="btn bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg smooth-transition hover:border-primary hover:text-primary flex items-center">
+                        <span class="mr-2">More Sizes</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="presetDropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-10 hidden smooth-transition">
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="19" data-height="19">
+                            <span class="font-medium">19×19</span> <span class="text-xs text-gray-500">Small icon</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="24" data-height="24">
+                            <span class="font-medium">24×24</span> <span class="text-xs text-gray-500">Icon</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="32" data-height="32">
+                            <span class="font-medium">32×32</span> <span class="text-xs text-gray-500">App icon</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="48" data-height="48">
+                            <span class="font-medium">48×48</span> <span class="text-xs text-gray-500">Menu icon</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="192" data-height="192">
+                            <span class="font-medium">192×192</span> <span class="text-xs text-gray-500">HD icon</span>
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="800" data-height="600">
+                            <span class="font-medium">800×600</span> <span class="text-xs text-gray-500">Standard</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1024" data-height="768">
+                            <span class="font-medium">1024×768</span> <span class="text-xs text-gray-500">HD display</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1920" data-height="1080">
+                            <span class="font-medium">1920×1080</span> <span class="text-xs text-gray-500">Full HD</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1280" data-height="720">
+                            <span class="font-medium">1280×720</span> <span class="text-xs text-gray-500">HD video</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1080" data-height="1080">
+                            <span class="font-medium">1080×1080</span> <span class="text-xs text-gray-500">Square</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1200" data-height="630">
+                            <span class="font-medium">1200×630</span> <span class="text-xs text-gray-500">Facebook</span>
+                        </a>
+                        <a href="#" class="preset-option block px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary" data-width="1080" data-height="1350">
+                            <span class="font-medium">1080×1350</span> <span class="text-xs text-gray-500">Instagram</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="col">
+                    <div class="size-option bg-primary text-white p-3 rounded-lg text-center cursor-pointer smooth-transition active" 
+                         data-width="150" data-height="150">
+                        <div class="text-lg font-medium">150×150</div>
+                        <div class="text-xs text-white/80 mt-1">Profile</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="size-option bg-gray-100 border border-gray-200 p-3 rounded-lg text-center cursor-pointer smooth-transition hover:bg-gray-200" 
+                         data-width="300" data-height="300">
+                        <div class="text-lg font-medium">300×300</div>
+                        <div class="text-xs text-gray-500 mt-1">Thumbnail</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="size-option bg-gray-100 border border-gray-200 p-3 rounded-lg text-center cursor-pointer smooth-transition hover:bg-gray-200" 
+                         data-width="800" data-height="600">
+                        <div class="text-lg font-medium">800×600</div>
+                        <div class="text-xs text-gray-500 mt-1">Standard</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="size-option bg-gray-100 border border-gray-200 p-3 rounded-lg text-center cursor-pointer smooth-transition hover:bg-gray-200" 
+                         data-width="1920" data-height="1080">
+                        <div class="text-lg font-medium">1920×1080</div>
+                        <div class="text-xs text-gray-500 mt-1">Full HD</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Editor Section -->
+        <section id="editorSection" class="editor-section mb-8 hidden card-shadow bg-white rounded-xl p-6 smooth-transition">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-xl font-semibold mb-4 md:mb-0 flex items-center">
+                    <i class="fas fa-scissors mr-2 text-primary"></i>Image Editor
+                </h2>
+                <button id="resetBtn" class="btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition">
+                    <i class="fas fa-undo mr-1"></i>Reset
+                </button>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div class="controls flex flex-wrap gap-3 mb-6 justify-center">
+                <button id="rotateLeft" class="btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition">
+                    <i class="fas fa-rotate-left mr-1"></i>Rotate Left
+                </button>
+                <button id="rotateRight" class="btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition">
+                    <i class="fas fa-rotate-right mr-1"></i>Rotate Right
+                </button>
+                <button id="flipHorizontal" class="btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition">
+                    <i class="fas fa-arrows-h mr-1"></i>Flip Horizontal
+                </button>
+                <button id="flipVertical" class="btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition">
+                    <i class="fas fa-arrows-v mr-1"></i>Flip Vertical
+                </button>
+            </div>
+            
+            <!-- Aspect Ratio Selection -->
+            <div class="controls flex flex-wrap gap-3 mb-6 justify-center">
+                <button class="ratio-btn active bg-primary text-white font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="NaN">
+                    <i class="fas fa-arrows-alt mr-1"></i>Free
+                </button>
+                <button class="ratio-btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="1">
+                    1:1 <span class="text-xs">(Square)</span>
+                </button>
+                <button class="ratio-btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="4/3">
+                    4:3 <span class="text-xs">(Standard)</span>
+                </button>
+                <button class="ratio-btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="16/9">
+                    16:9 <span class="text-xs">(Widescreen)</span>
+                </button>
+                <button class="ratio-btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="3/2">
+                    3:2 <span class="text-xs">(Camera)</span>
+                </button>
+                <button class="ratio-btn bg-gray-200 hover:bg-gray-300 text-dark font-medium px-4 py-2 rounded-lg smooth-transition" data-ratio="2/3">
+                    2:3 <span class="text-xs">(Portrait)</span>
+                </button>
+            </div>
+            
+            <!-- Cropping Area -->
+            <div class="cropper-container relative aspect-video md:aspect-auto border border-gray-200 rounded-lg overflow-hidden mb-6">
+                <img id="image" src="" alt="Image to crop" class="w-full h-full object-contain">
+                <div id="loadingIndicator" class="absolute inset-0 bg-white/80 flex items-center justify-center hidden">
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-3"></div>
+                        <p class="text-gray-600">Loading image...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Crop Button -->
+            <div class="controls flex justify-center mb-8">
+                <button id="cropBtn" class="btn bg-secondary hover:bg-secondary/90 text-white font-medium px-8 py-3 rounded-lg smooth-transition btn-hover">
+                    <i class="fas fa-check mr-2"></i>Crop Image
+                </button>
+            </div>
+            
+            <!-- Preview Section -->
+            <div class="preview-container">
+                <h3 class="text-md font-medium mb-4 flex items-center">
+                    <i class="fas fa-eye mr-2 text-primary"></i>Crop Preview
+                </h3>
+                <div id="previewResults" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-image text-4xl mb-3 opacity-30"></i>
+                        <p>Cropped results will appear here</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Download Section -->
+            <div class="download-all mt-8 text-center">
+                <button id="downloadAllBtn" class="btn bg-accent hover:bg-accent/90 text-white font-medium px-8 py-3 rounded-lg smooth-transition btn-hover">
+                    <i class="fas fa-download mr-2"></i>Download All Results
+                </button>
+            </div>
+        </section>
     </div>
 
-    <!-- 引入Cropper.js和依赖库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-    <script src="script.js"></script>
-		<script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Element references
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadSection = document.getElementById('uploadSection');
+            const editorSection = document.getElementById('editorSection');
+            const image = document.getElementById('image');
+            const cropBtn = document.getElementById('cropBtn');
+            const previewResults = document.getElementById('previewResults');
+            const rotateLeft = document.getElementById('rotateLeft');
+            const rotateRight = document.getElementById('rotateRight');
+            const flipHorizontal = document.getElementById('flipHorizontal');
+            const flipVertical = document.getElementById('flipVertical');
+            const resetBtn = document.getElementById('resetBtn');
+            const ratioBtns = document.querySelectorAll('.ratio-btn');
+            const sizeOptions = document.querySelectorAll('.size-option');
+            const downloadAllBtn = document.getElementById('downloadAllBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const presetDropdown = document.getElementById('presetDropdown');
+            const presetDropdownBtn = document.getElementById('presetDropdownBtn');
+            const presetOptions = document.querySelectorAll('.preset-option');
+            
+            let cropper;
+            let currentImageUrl;
+            let croppedResults = [];
+            let activeDropdownOption = null;
+            
+            // Show loading indicator
+            function showLoading() {
+                loadingIndicator.classList.remove('hidden');
+            }
+            
+            // Hide loading indicator
+            function hideLoading() {
+                loadingIndicator.classList.add('hidden');
+            }
+            
+            // Upload button click event
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // File selection event
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length) {
+                    const file = e.target.files[0];
+                    startCropper(file);
+                }
+            });
+            
+            // Drag and drop functionality
+            uploadSection.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadSection.classList.add('border-primary');
+                uploadSection.classList.add('bg-primary/5');
+            });
+            
+            uploadSection.addEventListener('dragleave', function() {
+                uploadSection.classList.remove('border-primary');
+                uploadSection.classList.remove('bg-primary/5');
+            });
+            
+            uploadSection.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadSection.classList.remove('border-primary');
+                uploadSection.classList.remove('bg-primary/5');
+                
+                if (e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('image/')) {
+                        startCropper(file);
+                    } else {
+                        showToast('Please select an image file', 'error');
+                    }
+                }
+            });
+            
+            // Initialize Cropper
+            function startCropper(file) {
+                // Release previous URL
+                if (currentImageUrl) {
+                    URL.revokeObjectURL(currentImageUrl);
+                }
+                
+                showLoading();
+                currentImageUrl = URL.createObjectURL(file);
+                image.src = currentImageUrl;
+                
+                // Initialize Cropper when image loads
+                image.onload = function() {
+                    hideLoading();
+                    uploadSection.classList.add('hidden');
+                    editorSection.style.display = 'block';
+                    previewResults.innerHTML = '';
+                    croppedResults = [];
+                    
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    
+                    cropper = new Cropper(image, {
+                        aspectRatio: NaN, // Initial free ratio
+                        viewMode: 1,
+                        autoCropArea: 0.8,
+                        responsive: true,
+                        restore: true,
+                        checkCrossOrigin: false,
+                        crop: function(e) {
+                            // Real-time feedback during cropping
+                            showCropInfo(e);
+                        }
+                    });
+                };
+                
+                // Image loading error handling
+                image.onerror = function() {
+                    hideLoading();
+                    showToast('Failed to load image, please try another', 'error');
+                };
+            }
+            
+            // Show crop information
+            function showCropInfo(e) {
+                // Can be used to display crop dimensions
+            }
+            
+            // Rotation and flip controls
+            rotateLeft.addEventListener('click', function() {
+                cropper.rotate(-90);
+                addAnimationToCropper();
+            });
+            
+            rotateRight.addEventListener('click', function() {
+                cropper.rotate(90);
+                addAnimationToCropper();
+            });
+            
+            flipHorizontal.addEventListener('click', function() {
+                const scaleX = cropper.getData().scaleX || 1;
+                cropper.scaleX(-scaleX);
+                addAnimationToCropper();
+            });
+            
+            flipVertical.addEventListener('click', function() {
+                const scaleY = cropper.getData().scaleY || 1;
+                cropper.scaleY(-scaleY);
+                addAnimationToCropper();
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                cropper.reset();
+                addAnimationToCropper();
+            });
+            
+            // Add animation to cropper
+            function addAnimationToCropper() {
+                const container = cropper.getContainer();
+                container.classList.add('scale-105');
+                setTimeout(() => {
+                    container.classList.remove('scale-105');
+                }, 300);
+            }
+            
+            // Aspect ratio buttons
+            ratioBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    ratioBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                    });
+                    this.classList.add('bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                    
+                    const ratio = eval(this.dataset.ratio); // Using eval to parse fractions like 4/3
+                    cropper.setAspectRatio(isNaN(ratio) ? NaN : ratio);
+                });
+            });
+            
+            // Preset sizes - visible section
+            sizeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // If no image is selected, prompt user to select one
+                    if (!cropper) {
+                        showToast('Please select an image first', 'info');
+                        return;
+                    }
+                    
+                    sizeOptions.forEach(opt => {
+                        opt.classList.remove('bg-primary', 'text-white');
+                        opt.classList.add('bg-gray-100', 'border', 'border-gray-200');
+                    });
+                    this.classList.add('bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-100', 'border', 'border-gray-200');
+                    
+                    applyPresetSize(this.dataset.width, this.dataset.height);
+                });
+            });
+            
+            // Preset sizes - dropdown menu
+            presetOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const width = this.dataset.width;
+                    const height = this.dataset.height;
+                    
+                    // Update active state
+                    if (activeDropdownOption) {
+                        activeDropdownOption.classList.remove('bg-primary/10', 'text-primary');
+                    }
+                    this.classList.add('bg-primary/10', 'text-primary');
+                    activeDropdownOption = this;
+                    
+                    // Close dropdown
+                    presetDropdown.classList.add('hidden');
+                    
+                    // Apply size
+                    applyPresetSize(width, height);
+                    
+                    // Find matching preset in visible section and activate it
+                    const matchingSize = Array.from(sizeOptions).find(opt => 
+                        opt.dataset.width === width && opt.dataset.height === height
+                    );
+                    if (matchingSize) {
+                        sizeOptions.forEach(opt => {
+                            opt.classList.remove('bg-primary', 'text-white');
+                            opt.classList.add('bg-gray-100', 'border', 'border-gray-200');
+                        });
+                        matchingSize.classList.add('bg-primary', 'text-white');
+                        matchingSize.classList.remove('bg-gray-100', 'border', 'border-gray-200');
+                    }
+                });
+            });
+            
+            // Dropdown show/hide
+            presetDropdownBtn.addEventListener('click', function() {
+                presetDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking elsewhere
+            document.addEventListener('click', function(e) {
+                if (!presetDropdownBtn.contains(e.target) && !presetDropdown.contains(e.target)) {
+                    presetDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Apply preset size
+            function applyPresetSize(width, height) {
+                const ratio = width / height;
+                
+                // Update ratio button states
+                ratioBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                });
+                const matchingRatioBtn = [...ratioBtns].find(b => {
+                    const btnRatio = eval(b.dataset.ratio);
+                    return !isNaN(btnRatio) && Math.abs(btnRatio - ratio) < 0.01;
+                });
+                
+                if (matchingRatioBtn) {
+                    matchingRatioBtn.classList.add('bg-primary', 'text-white');
+                    matchingRatioBtn.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                } else {
+                    ratioBtns[0].classList.add('bg-primary', 'text-white'); // Free ratio
+                    ratioBtns[0].classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                }
+                
+                cropper.setAspectRatio(ratio);
+                
+                // Set crop box size
+                const containerData = cropper.getContainerData();
+                const containerRatio = containerData.width / containerData.height;
+                
+                let cropWidth, cropHeight;
+                if (ratio > containerRatio) {
+                    cropWidth = containerData.width * 0.8;
+                    cropHeight = cropWidth / ratio;
+                } else {
+                    cropHeight = containerData.height * 0.8;
+                    cropWidth = cropHeight * ratio;
+                }
+                
+                cropper.setData({
+                    width: cropWidth,
+                    height: cropHeight
+                });
+            }
+            
+            // Crop button
+            cropBtn.addEventListener('click', function() {
+                if (!cropper) {
+                    showToast('Please select an image first', 'info');
+                    return;
+                }
+                
+                showLoading();
+                const canvas = cropper.getCroppedCanvas({
+                    minWidth: 50,
+                    minHeight: 50,
+                    maxWidth: 4096,
+                    maxHeight: 4096,
+                    fillColor: '#fff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                
+                hideLoading();
+                
+                if (!canvas) {
+                    showToast('Crop failed, please try again', 'error');
+                    return;
+                }
+                
+                // Get current selected preset size
+                let sizeName = 'Custom';
+                let sizeDesc = 'Custom size';
+                const activeSize = document.querySelector('.size-option.active') || activeDropdownOption;
+                if (activeSize) {
+                    sizeName = `${activeSize.dataset.width}×${activeSize.dataset.height}`;
+                    sizeDesc = activeSize.querySelector('.text-xs')?.textContent || 'Custom size';
+                }
+                
+                // Create preview
+                const previewId = 'preview-' + Date.now();
+                const previewBox = document.createElement('div');
+                previewBox.className = 'preview-box bg-white rounded-lg overflow-hidden card-shadow smooth-transition hover:card-shadow-hover';
+                previewBox.innerHTML = `
+                    <div class="preview-img p-4">
+                        <img src="${canvas.toDataURL('image/jpeg')}" alt="Crop preview" class="w-full h-auto">
+                    </div>
+                    <div class="p-3">
+                        <div class="font-medium">${sizeName}</div>
+                        <div class="text-sm text-gray-500">${sizeDesc}</div>
+                    </div>
+                    <div class="p-3 bg-gray-50">
+                        <button class="btn bg-primary hover:bg-primary/90 text-white font-medium px-4 py-2 rounded-lg smooth-transition w-full download-btn" data-id="${previewId}">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </button>
+                    </div>
+                `;
+                
+                // Fade-in animation
+                previewBox.style.opacity = '0';
+                previewBox.style.transform = 'translateY(10px)';
+                previewResults.appendChild(previewBox);
+                
+                setTimeout(() => {
+                    previewBox.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    previewBox.style.opacity = '1';
+                    previewBox.style.transform = 'translateY(0)';
+                }, 50);
+                
+                // Store cropped result
+                croppedResults.push({
+                    id: previewId,
+                    canvas: canvas,
+                    name: `cropped_${sizeName}_${Date.now()}.jpg`
+                });
+                
+                // Show success message
+                showToast('Image cropped successfully', 'success');
+            });
+            
+            // Download single cropped result
+            previewResults.addEventListener('click', function(e) {
+                if (e.target.classList.contains('download-btn')) {
+                    const id = e.target.dataset.id;
+                    const result = croppedResults.find(r => r.id === id);
+                    if (result) {
+                        downloadCanvas(result.canvas, result.name);
+                    }
+                }
+            });
+            
+            // Download all cropped results
+            downloadAllBtn.addEventListener('click', function() {
+                if (croppedResults.length === 0) {
+                    showToast('No cropped results to download', 'info');
+                    return;
+                }
+                
+                // Show loading state
+                downloadAllBtn.disabled = true;
+                downloadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Preparing download...';
+                
+                // Create ZIP download
+                const zip = new JSZip();
+                const imgFolder = zip.folder("cropped_images");
+                
+                // Add all cropped results to ZIP
+                croppedResults.forEach((result, index) => {
+                    // Convert canvas to Blob
+                    result.canvas.toBlob(function(blob) {
+                        imgFolder.file(result.name, blob);
+                        
+                        // When all images are added to ZIP, generate and download
+                        if (index === croppedResults.length - 1) {
+                            zip.generateAsync({type: 'blob'}).then(function(content) {
+                                const link = document.createElement('a');
+                                link.download = 'cropped_images.zip';
+                                link.href = URL.createObjectURL(content);
+                                link.click();
+                                
+                                // Reset button state
+                                downloadAllBtn.disabled = false;
+                                downloadAllBtn.innerHTML = '<i class="fas fa-download mr-2"></i>Download All Results';
+                                
+                                // Show success message
+                                showToast('Download started', 'success');
+                                
+                                // Release resources
+                                setTimeout(() => {
+                                    URL.revokeObjectURL(link.href);
+                                }, 100);
+                            });
+                        }
+                    }, 'image/jpeg', 0.95); // Set JPEG quality to 95%
+                });
+            });
+            
+            // Download Canvas as image
+            function downloadCanvas(canvas, filename) {
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    
+                    // Release resources
+                    setTimeout(() => {
+                        URL.revokeObjectURL(link.href);
+                    }, 100);
+                }, 'image/jpeg', 0.95); // Set JPEG quality to 95%
+            }
+            
+            // Notification toast
+            function showToast(message, type = 'info') {
+                // Remove old toast
+                const oldToast = document.querySelector('.custom-toast');
+                if (oldToast) oldToast.remove();
+                
+                // Create new toast
+                const toast = document.createElement('div');
+                toast.className = 'custom-toast';
+                
+                // Set style based on type
+                if (type === 'success') {
+                    toast.classList.add('bg-secondary', 'text-white');
+                    toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+                } else if (type === 'error') {
+                    toast.classList.add('bg-red-500', 'text-white');
+                    toast.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>${message}`;
+                } else {
+                    toast.classList.add('bg-primary', 'text-white');
+                    toast.innerHTML = `<i class="fas fa-info-circle mr-2"></i>${message}`;
+                }
+                
+                document.body.appendChild(toast);
+                
+                // Show toast
+                setTimeout(() => {
+                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    toast.style.opacity = '1';
+                    toast.style.transform = 'translateY(0)';
+                }, 50);
+                
+                // Auto-hide
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(20px)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            
+            // Mobile adaptation - touch event optimization
+            function initTouchSupport() {
+                if ('ontouchstart' in document.documentElement) {
+                    // Adjust button sizes for touch devices
+                    const buttons = document.querySelectorAll('button');
+                    buttons.forEach(btn => {
+                        btn.classList.add('py-3', 'px-6');
+                    });
+                }
+            }
+            
+            initTouchSupport();
+        });
+    </script>
+    <script>
+        
 	var _hmt = _hmt || [];
 	(function() {
 	  var hm = document.createElement("script");
@@ -98,7 +759,7 @@
 	  var s = document.getElementsByTagName("script")[0]; 
 	  s.parentNode.insertBefore(hm, s);
 	})();
-	</script>
-
+	
+    </script>
 </body>
 </html>
