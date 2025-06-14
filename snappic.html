@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Image Cropper Online | Resize Photos to Exact Sizes</title>
+	<meta name="keywords" content="free image cropper, crop tool, resize photo, social media image resizer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .upload-section {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+        }
+        #image {
+            max-width: 100%;
+            max-height: 400px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        button {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .preview {
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Free Image Cropper Tool ✂️</h1>
+        
+        <div class="upload-section">
+		
+            <input type="file" id="upload" accept="image/*" value="Image">
+            <p>drop an image here 🖼️</p>
+        </div>
+
+        <div class="controls">
+            <label for="size">Crop size:</label>
+            <select id="size">
+                <option value="64x64">64×64(Icons)</option>
+                <option value="128x128">128×128</option>
+                <option value="192x192">192×192</option>
+                <option value="256x256">256×256</option>
+                <option value="512x512">512×512 (HD Avatars)</option>
+                <option value="1024x1024">1024×1024</option>
+                <option value="1080x1080">1080×1080(Instagram)</option>
+                <option value="1200x630">1200×630(Facebook OG)</option>
+                <option value="1920x1080">1920×1080(16:9 Widescreen)</option>
+            </select>
+            <button id="crop-btn">Crop ✂️</button>
+            <button id="download-btn">Download 🔽</button>
+        </div>
+
+        <div>
+            <img id="image" src="" alt="Preview">
+        </div>
+
+        <div class="preview-container">
+            <h3>Cropped Preview:</h3>
+            <div class="preview"></div>
+        </div>
+    </div>
+
+    <!-- 引入Cropper.js和依赖库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
