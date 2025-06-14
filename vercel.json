@@ -2,11 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.html",  // 匹配所有 HTML 文件
+      "src": "*.html",  
       "use": "@vercel/static"
     },
     {
-      "src": "*.js",    // 匹配所有 JS 文件
+      "src": "*.js",   
       "use": "@vercel/static"
     }
   ],
